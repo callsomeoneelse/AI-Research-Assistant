@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Proactive Research Assistant",
+  "version": "1.0",
+  "description": "AI-powered research assistant that suggests relevant papers as you read",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "https://*/*"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["https://*/*"],
+      "js": ["content.js"],
+      "css": ["sidebar.css"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["sidebar.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Research Assistant"
+  }
+}

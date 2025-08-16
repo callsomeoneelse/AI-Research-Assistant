@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <style>
+        body {
+            width: 350px;
+            padding: 20px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            margin: 0;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+        }
+        
+        .header p {
+            margin: 5px 0 0 0;
+            opacity: 0.8;
+            font-size: 14px;
+        }
+        
+        .stats {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .stat-item:last-child {
+            margin-bottom: 0;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        
+        .stat-value {
+            font-weight: 600;
+            font-size: 16px;
+        }
+        
+        .controls {
+            space-y: 10px;
+        }
+        
+        .control-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .toggle-switch.active {
+            background: #4CAF50;
+        }
+        
+        .toggle-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+        
+        .toggle-switch.active::after {
+            transform: translateX(26px);
+        }
+        
+        .button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            margin-bottom: 10px;
+        }
+        
+        .button:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .button.primary {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+        
+        .button.primary:hover {
+            background: #45a049;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255,255,255,0.2);
+            font-size: 12px;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>📚 Research Assistant</h1>
+        <p>AI-powered paper suggestions</p>
+    </div>
+    
+    <div class="stats">
+        <div class="stat-item">
+            <span class="stat-label">📄 Papers analyzed today</span>
+            <span class="stat-value">3</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">💡 Suggestions made</span>
+            <span class="stat-value">12</span>
+        </div>
+        <div class="stat-item">
+            <span class="stat-label">💾 Papers saved</span>
+            <span class="stat-value">5</span>
+        </div>
+    </div>
+    
+    <div class="controls">
+        <div class="control-item">
+            <span>🤖 AI-powered suggestions</span>
+            <div class="toggle-switch active" id="enableAI"></div>
+        </div>
+        
+        <div class="control-item">
+            <span>Enable suggestions</span>
+            <div class="toggle-switch active" id="enableSuggestions"></div>
+        </div>
+        
+        <div class="control-item">
+            <span>Show notifications</span>
+            <div class="toggle-switch active" id="showNotifications"></div>
+        </div>
+        
+        <div class="control-item">
+            <span>Auto-analyze on scroll</span>
+            <div class="toggle-switch" id="autoAnalyze"></div>
+        </div>
+    </div>
+    
+    <div class="ai-section">
+        <p style="font-size: 11px; opacity: 0.7; margin: 10px 0;">
+            🤖 AI features enabled with smart keyword extraction and relevance scoring
+        </p>
+    </div>
+    
+    <button class="button primary" id="analyzeNow">🔍 Analyze Current Page</button>
+    <button class="button" id="viewSaved">💾 View Saved Papers</button>
+    <button class="button" id="settings">⚙️ Settings</button>
+    
+    <div class="footer">
+        <p>Research Assistant v1.0</p>
+        <p>Hackathon Demo</p>
+    </div>
+
+    <script>
+        // Simple popup functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load saved settings
+            chrome.storage.local.get(['enableAI', 'openai_api_key'], function(result) {
+                const aiToggle = document.getElementById('enableAI');
+                const aiSection = document.getElementById('aiSection');
+                const apiKeyInput = document.getElementById('apiKey');
+                
+                if (result.enableAI) {
+                    aiToggle.classList.add('active');
+                    aiSection.style.display = 'block';
+                }
+                
+                if (result.openai_api_key) {
+                    apiKeyInput.placeholder = 'API Key saved ✓';
+                }
+            });
+            
+            // Toggle switches
+            document.querySelectorAll('.toggle-switch').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    this.classList.toggle('active');
+                    
+                    // Special handling for AI toggle
+                    if (this.id === 'enableAI') {
+                        const aiSection = document.getElementById('aiSection');
+                        const isEnabled = this.classList.contains('active');
+                        aiSection.style.display = isEnabled ? 'block' : 'none';
+                        
+                        // Save AI setting
+                        chrome.storage.local.set({ enableAI: isEnabled });
+                    }
+                });
+            });
+            
+            // Save API Key
+            document.getElementById('saveApiKey').addEventListener('click', function() {
+                const apiKey = document.getElementById('apiKey').value.trim();
+                if (apiKey) {
+                    chrome.storage.local.set({ openai_api_key: apiKey }, function() {
+                        document.getElementById('apiKey').value = '';
+                        document.getElementById('apiKey').placeholder = 'API Key saved ✓';
+                        
+                        // Show success feedback
+                        const button = document.getElementById('saveApiKey');
+                        const originalText = button.textContent;
+                        button.textContent = '✅ Saved!';
+                        button.style.background = '#4CAF50';
+                        
+                        setTimeout(() => {
+                            button.textContent = originalText;
+                            button.style.background = '';
+                        }, 2000);
+                    });
+                } else {
+                    alert('Please enter an API key');
+                }
+            });
+            
+            // Button handlers
+            document.getElementById('analyzeNow').addEventListener('click', function() {
+                // Send message to content script
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                    chrome.tabs.sendMessage(tabs[0].id, {action: 'analyze'});
+                });
+                window.close();
+            });
+            
+            document.getElementById('viewSaved').addEventListener('click', function() {
+                chrome.tabs.create({url: chrome.runtime.getURL('saved.html')});
+                window.close();
+            });
+            
+            document.getElementById('settings').addEventListener('click', function() {
+                chrome.tabs.create({url: chrome.runtime.getURL('settings.html')});
+                window.close();
+            });
+        });
+    </script>
+</body>
+</html>
