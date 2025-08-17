@@ -1,4 +1,6 @@
 // Background script for Research Assistant extension
+// SECURE: API key is only accessible in extension context, not web pages
+const OPENAI_API_KEY = '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';
 
 // Extension installation handler
 chrome.runtime.onInstalled.addListener(() => {
@@ -35,6 +37,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     return true; // Keep channel open for async response
   }
   
+  // NEW: Handle OpenAI API calls securely
+  if (request.action === 'callOpenAI') {
+    callOpenAI(request.payload)
+      .then(result => sendResponse({status: 'success', data: result}))
+      .catch(error => sendResponse({status: 'error', error: error.message}));
+    return true; // Keep message channel open for async response
+  }
+  
   if (request.action === 'updateStats') {
     // Update extension stats
     chrome.storage.local.get(['papersAnalyzed', 'suggestionsMade', 'papersSaved'], (result) => {
@@ -50,6 +60,29 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   
   return true; // Keep message channel open for async response
 });
+
+// NEW: Secure OpenAI API handler
+async function callOpenAI(payload) {
+  if (!OPENAI_API_KEY || OPENAI_API_KEY.startsWith('your-api-key-here')) {
+    throw new Error('OpenAI API key not configured');
+  }
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${OPENAI_API_KEY}`
+    },
+    body: JSON.stringify(payload)
+  });
+  
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`OpenAI API error: ${response.status} - ${errorText}`);
+  }
+  
+  return await response.json();
+}
 
 // API functions in background script
 async function searchPapersAPI(keywords) {
@@ -89,8 +122,6 @@ async function searchArxiv(keywords) {
     return { success: false, error: error.message };
   }
 }
-
-// Remove XML parsing functions - will be handled in content script
 
 function calculateRelevance(text, keywords) {
   const lowerText = text.toLowerCase();

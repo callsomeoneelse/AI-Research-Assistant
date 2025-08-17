@@ -105,42 +105,35 @@ class ResearchAssistant {
 
   async generateAIInsights(content) {
     try {
-      // Hardcoded API key - replace with your actual key
-      const API_KEY = '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'; // Replace this with your actual API key
-      
-      if (!API_KEY || API_KEY === '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') {
-        return;
-      }
-
       this.updateStatus('🤖 Generating AI insights...');
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a research assistant. Provide a brief, insightful summary of the key research contribution and its significance. Keep it under 50 words.'
-            },
-            {
-              role: 'user',
-              content: `Summarize the key contribution of this research paper:\n\n${content.substring(0, 1000)}`
-            }
-          ],
-          max_tokens: 80,
-          temperature: 0.7
-        })
+      const payload = {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a research assistant. Provide a brief, insightful summary of the key research contribution and its significance. Keep it under 50 words.'
+          },
+          {
+            role: 'user',
+            content: `Summarize the key contribution of this research paper:\n\n${content.substring(0, 1000)}`
+          }
+        ],
+        max_tokens: 80,
+        temperature: 0.7
+      };
+
+      // Send request to background script (SECURE)
+      const response = await chrome.runtime.sendMessage({
+        action: 'callOpenAI',
+        payload: payload
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const insight = data.choices[0].message.content.trim();
+      if (response.status === 'success') {
+        const insight = response.data.choices[0].message.content.trim();
         this.displayAIInsight(insight);
+      } else {
+        console.error('AI insights generation failed:', response.error);
       }
     } catch (error) {
       console.log('AI insights generation failed:', error);
@@ -215,51 +208,39 @@ class ResearchAssistant {
 
   async extractKeywordsWithAI(content) {
     try {
-      // Hardcoded API key - replace with your actual key
-      const API_KEY = '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'; // Replace this with your actual API key
-      
-      if (!API_KEY || API_KEY === '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') {
-        console.log('No API key configured, using simple extraction');
-        return null;
-      }
+      const payload = {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a research assistant that extracts key academic terms and concepts from research papers. Return only the most important keywords/phrases separated by commas, no explanations.'
+          },
+          {
+            role: 'user',
+            content: `Extract the 10 most important academic keywords and concepts from this research paper content:\n\n${content.substring(0, 1500)}`
+          }
+        ],
+        max_tokens: 100,
+        temperature: 0.3
+      };
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a research assistant that extracts key academic terms and concepts from research papers. Return only the most important keywords/phrases separated by commas, no explanations.'
-            },
-            {
-              role: 'user',
-              content: `Extract the 10 most important academic keywords and concepts from this research paper content:\n\n${content.substring(0, 1500)}`
-            }
-          ],
-          max_tokens: 100,
-          temperature: 0.3
-        })
+      const response = await chrome.runtime.sendMessage({
+        action: 'callOpenAI',
+        payload: payload
       });
 
-      if (!response.ok) {
-        throw new Error(`OpenAI API error: ${response.status}`);
+      if (response.status === 'success') {
+        const keywords = response.data.choices[0].message.content
+          .split(',')
+          .map(k => k.trim().toLowerCase())
+          .filter(k => k.length > 2)
+          .slice(0, 10);
+
+        console.log('AI extracted keywords:', keywords);
+        return keywords;
+      } else {
+        throw new Error(response.error);
       }
-
-      const data = await response.json();
-      const keywords = data.choices[0].message.content
-        .split(',')
-        .map(k => k.trim().toLowerCase())
-        .filter(k => k.length > 2)
-        .slice(0, 10);
-
-      console.log('AI extracted keywords:', keywords);
-      return keywords;
-
     } catch (error) {
       console.error('AI keyword extraction failed:', error);
       return null;
@@ -302,7 +283,7 @@ class ResearchAssistant {
         // Parse the raw data returned from background script
         for (const result of response.papers) {
           if (result.type === 'arxiv') {
-            const arxivPapers = this.parseArxivResponse(result.data, result.keywords);
+            const arxivPapers = await this.parseArxivResponse(result.data, result.keywords);
             suggestions.push(...arxivPapers);
           }
         }
@@ -318,7 +299,7 @@ class ResearchAssistant {
     }
   }
 
-  parseArxivResponse(xmlText, keywords) {
+  async parseArxivResponse(xmlText, keywords) {
     try {
       const parser = new DOMParser();
       const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
@@ -342,7 +323,7 @@ class ResearchAssistant {
           
           if (title && summary && id) {
             const year = new Date(published).getFullYear();
-            const relevance = this.calculateRelevance(title + ' ' + summary, keywords);
+            const relevance = await this.calculateRelevance(title + ' ' + summary, keywords);
             
             papers.push({
               title: title,
@@ -367,54 +348,48 @@ class ResearchAssistant {
     }
   }
 
-  calculateRelevance(text, keywords) {
-    // Try AI-powered relevance scoring
-    return this.calculateRelevanceWithAI(text, keywords)
-      .catch(() => this.calculateRelevanceSimple(text, keywords));
+  async calculateRelevance(text, keywords) {
+    // Try AI-powered relevance scoring first
+    try {
+      return await this.calculateRelevanceWithAI(text, keywords);
+    } catch (error) {
+      return this.calculateRelevanceSimple(text, keywords);
+    }
   }
 
   async calculateRelevanceWithAI(text, keywords) {
     try {
-      // Hardcoded API key - replace with your actual key
-      const API_KEY = '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'; // Replace this with your actual API key
-      
-      if (!API_KEY || API_KEY === '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') {
-        return this.calculateRelevanceSimple(text, keywords);
-      }
+      const payload = {
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: 'You are a research assistant that scores paper relevance. Return only a number between 0 and 1 indicating how relevant a paper is to given keywords. Higher scores mean more relevant.'
+          },
+          {
+            role: 'user',
+            content: `Rate the relevance (0-1) of this paper to keywords [${keywords.join(', ')}]:\n\nTitle and Abstract: ${text.substring(0, 500)}`
+          }
+        ],
+        max_tokens: 10,
+        temperature: 0.1
+      };
 
-      const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${API_KEY}`
-        },
-        body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'system',
-              content: 'You are a research assistant that scores paper relevance. Return only a number between 0 and 1 indicating how relevant a paper is to given keywords. Higher scores mean more relevant.'
-            },
-            {
-              role: 'user',
-              content: `Rate the relevance (0-1) of this paper to keywords [${keywords.join(', ')}]:\n\nTitle and Abstract: ${text.substring(0, 500)}`
-            }
-          ],
-          max_tokens: 10,
-          temperature: 0.1
-        })
+      const response = await chrome.runtime.sendMessage({
+        action: 'callOpenAI',
+        payload: payload
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        const score = parseFloat(data.choices[0].message.content.trim());
+      if (response.status === 'success') {
+        const score = parseFloat(response.data.choices[0].message.content.trim());
         return isNaN(score) ? this.calculateRelevanceSimple(text, keywords) : Math.max(0, Math.min(1, score));
+      } else {
+        throw new Error(response.error);
       }
     } catch (error) {
       console.log('AI relevance scoring failed, using simple method');
+      return this.calculateRelevanceSimple(text, keywords);
     }
-    
-    return this.calculateRelevanceSimple(text, keywords);
   }
 
   calculateRelevanceSimple(text, keywords) {
