@@ -58,7 +58,7 @@
         }
         
         .controls {
-            space-y: 10px;
+            margin-bottom: 20px;
         }
         
         .control-item {
@@ -124,6 +124,10 @@
             background: #45a049;
         }
         
+        .ai-section {
+            margin-bottom: 20px;
+        }
+        
         .footer {
             text-align: center;
             margin-top: 20px;
@@ -136,31 +140,26 @@
 </head>
 <body>
     <div class="header">
-        <h1>📚 Research Assistant</h1>
+        <h1>Research Assistant</h1>
         <p>AI-powered paper suggestions</p>
     </div>
     
     <div class="stats">
         <div class="stat-item">
-            <span class="stat-label">📄 Papers analyzed today</span>
-            <span class="stat-value">3</span>
+            <span class="stat-label">Papers analyzed today</span>
+            <span class="stat-value" id="papersAnalyzed">0</span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">💡 Suggestions made</span>
-            <span class="stat-value">12</span>
+            <span class="stat-label">Suggestions made</span>
+            <span class="stat-value" id="suggestionsMade">0</span>
         </div>
         <div class="stat-item">
-            <span class="stat-label">💾 Papers saved</span>
-            <span class="stat-value">5</span>
+            <span class="stat-label">Papers saved</span>
+            <span class="stat-value" id="papersSaved">0</span>
         </div>
     </div>
     
     <div class="controls">
-        <div class="control-item">
-            <span>🤖 AI-powered suggestions</span>
-            <div class="toggle-switch active" id="enableAI"></div>
-        </div>
-        
         <div class="control-item">
             <span>Enable suggestions</span>
             <div class="toggle-switch active" id="enableSuggestions"></div>
@@ -175,102 +174,33 @@
             <span>Auto-analyze on scroll</span>
             <div class="toggle-switch" id="autoAnalyze"></div>
         </div>
+        
+        <div class="control-item">
+            <span>Recent papers only</span>
+            <div class="toggle-switch active" id="recentPapers"></div>
+        </div>
+        
+        <div class="control-item">
+            <span>High citations filter</span>
+            <div class="toggle-switch active" id="highCitations"></div>
+        </div>
     </div>
     
     <div class="ai-section">
         <p style="font-size: 11px; opacity: 0.7; margin: 10px 0;">
-            🤖 AI features enabled with smart keyword extraction and relevance scoring
+            AI features enabled with smart keyword extraction and relevance scoring
         </p>
     </div>
     
-    <button class="button primary" id="analyzeNow">🔍 Analyze Current Page</button>
-    <button class="button" id="viewSaved">💾 View Saved Papers</button>
-    <button class="button" id="settings">⚙️ Settings</button>
+    <button class="button primary" id="analyzeNow">Analyze Current Page</button>
+    <button class="button" id="viewSaved">View Saved Papers</button>
+    <button class="button" id="settings">Settings</button>
     
     <div class="footer">
         <p>Research Assistant v1.0</p>
         <p>Hackathon Demo</p>
     </div>
 
-    <script>
-        // Simple popup functionality
-        document.addEventListener('DOMContentLoaded', function() {
-            // Load saved settings
-            chrome.storage.local.get(['enableAI', 'openai_api_key'], function(result) {
-                const aiToggle = document.getElementById('enableAI');
-                const aiSection = document.getElementById('aiSection');
-                const apiKeyInput = document.getElementById('apiKey');
-                
-                if (result.enableAI) {
-                    aiToggle.classList.add('active');
-                    aiSection.style.display = 'block';
-                }
-                
-                if (result.openai_api_key) {
-                    apiKeyInput.placeholder = 'API Key saved ✓';
-                }
-            });
-            
-            // Toggle switches
-            document.querySelectorAll('.toggle-switch').forEach(toggle => {
-                toggle.addEventListener('click', function() {
-                    this.classList.toggle('active');
-                    
-                    // Special handling for AI toggle
-                    if (this.id === 'enableAI') {
-                        const aiSection = document.getElementById('aiSection');
-                        const isEnabled = this.classList.contains('active');
-                        aiSection.style.display = isEnabled ? 'block' : 'none';
-                        
-                        // Save AI setting
-                        chrome.storage.local.set({ enableAI: isEnabled });
-                    }
-                });
-            });
-            
-            // Save API Key
-            document.getElementById('saveApiKey').addEventListener('click', function() {
-                const apiKey = document.getElementById('apiKey').value.trim();
-                if (apiKey) {
-                    chrome.storage.local.set({ openai_api_key: apiKey }, function() {
-                        document.getElementById('apiKey').value = '';
-                        document.getElementById('apiKey').placeholder = 'API Key saved ✓';
-                        
-                        // Show success feedback
-                        const button = document.getElementById('saveApiKey');
-                        const originalText = button.textContent;
-                        button.textContent = '✅ Saved!';
-                        button.style.background = '#4CAF50';
-                        
-                        setTimeout(() => {
-                            button.textContent = originalText;
-                            button.style.background = '';
-                        }, 2000);
-                    });
-                } else {
-                    alert('Please enter an API key');
-                }
-            });
-            
-            // Button handlers
-            document.getElementById('analyzeNow').addEventListener('click', function() {
-                // Send message to content script
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                    chrome.tabs.sendMessage(tabs[0].id, {action: 'analyze'});
-                });
-                window.close();
-            });
-            
-            document.getElementById('viewSaved').addEventListener('click', function() {
-                chrome.tabs.create({url: chrome.runtime.getURL('saved.html')});
-                window.close();
-            });
-            
-            document.getElementById('settings').addEventListener('click', function() {
-                chrome.tabs.create({url: chrome.runtime.getURL('settings.html')});
-                window.close();
-            });
-        });
-    </script>
+    <script src="popup.js"></script>
 </body>
 </html>

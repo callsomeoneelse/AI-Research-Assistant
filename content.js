@@ -216,9 +216,9 @@ class ResearchAssistant {
   async extractKeywordsWithAI(content) {
     try {
       // Hardcoded API key - replace with your actual key
-      const API_KEY = 'sk-your-openai-api-key-here'; // Replace this with your actual API key
+      const API_KEY = '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'; // Replace this with your actual API key
       
-      if (!API_KEY || API_KEY === 'sk-your-openai-api-key-here') {
+      if (!API_KEY || API_KEY === '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') {
         console.log('No API key configured, using simple extraction');
         return null;
       }
@@ -376,9 +376,9 @@ class ResearchAssistant {
   async calculateRelevanceWithAI(text, keywords) {
     try {
       // Hardcoded API key - replace with your actual key
-      const API_KEY = 'sk-your-openai-api-key-here'; // Replace this with your actual API key
+      const API_KEY = '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'; // Replace this with your actual API key
       
-      if (!API_KEY || API_KEY === 'sk-your-openai-api-key-here') {
+      if (!API_KEY || API_KEY === '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') {
         return this.calculateRelevanceSimple(text, keywords);
       }
 

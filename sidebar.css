@@ -1,4 +1,13 @@
-/* Research Assistant Sidebar Styles */
+.sidebar-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  transition: opacity 0.3s ease;
+}
+
+#research-assistant-sidebar.collapsed .sidebar-header h3 {
+  opacity: 0;
+}/* Research Assistant Sidebar Styles */
 #research-assistant-sidebar {
   position: fixed;
   top: 0;
@@ -26,27 +35,29 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255,255,255,0.2);
-}
-
-.sidebar-header h3 {
-  margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  position: relative;
 }
 
 #toggle-sidebar {
-  background: none;
-  border: none;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.3);
   color: white;
-  font-size: 20px;
+  font-size: 18px;
   cursor: pointer;
-  padding: 5px;
+  padding: 8px 10px;
   border-radius: 4px;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  min-width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  order: -1;
 }
 
 #toggle-sidebar:hover {
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.2);
+  transform: scale(1.1);
 }
 
 .sidebar-content {
