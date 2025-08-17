@@ -38,18 +38,18 @@ class ResearchAssistant {
     this.sidebar.id = 'research-assistant-sidebar';
     this.sidebar.innerHTML = `
       <div class="sidebar-header">
-        <h3>📚 Research Assistant</h3>
+        <h3>Research Assistant</h3>
         <button id="toggle-sidebar">−</button>
       </div>
       <div class="sidebar-content">
         <div class="status">
-          <div class="analyzing">🔍 Analyzing paper...</div>
+          <div class="analyzing">Analyzing paper...</div>
         </div>
         <div class="suggestions-container">
           <h4>Suggested Papers</h4>
           <div class="ai-insights" id="aiInsights" style="display: none;">
             <div class="insight-box">
-              <strong>🤖 AI Insight:</strong>
+              <strong>AI Insight:</strong>
               <p class="ai-summary"></p>
             </div>
           </div>
@@ -80,7 +80,7 @@ class ResearchAssistant {
     if (this.isAnalyzing) return;
     
     this.isAnalyzing = true;
-    this.updateStatus('🔍 Analyzing paper...');
+    this.updateStatus('Analyzing paper...');
     
     try {
       // Extract key content from the page
@@ -94,10 +94,10 @@ class ResearchAssistant {
       
       this.suggestions = suggestions;
       this.displaySuggestions();
-      this.updateStatus('✅ Analysis complete');
+      this.updateStatus('Analysis complete');
     } catch (error) {
       console.error('Analysis failed:', error);
-      this.updateStatus('❌ Analysis failed');
+      this.updateStatus('Analysis failed');
     } finally {
       this.isAnalyzing = false;
     }
@@ -105,7 +105,7 @@ class ResearchAssistant {
 
   async generateAIInsights(content) {
     try {
-      this.updateStatus('🤖 Generating AI insights...');
+      this.updateStatus('Generating AI insights...');
 
       const payload = {
         model: 'gpt-3.5-turbo',
@@ -123,7 +123,7 @@ class ResearchAssistant {
         temperature: 0.7
       };
 
-      // Send request to background script (SECURE)
+      // Send request to background script 
       const response = await chrome.runtime.sendMessage({
         action: 'callOpenAI',
         payload: payload
@@ -473,17 +473,17 @@ class ResearchAssistant {
           <span class="year">(${paper.year})</span>
         </div>
         <div class="paper-stats">
-          <span class="citations">📊 ${paper.citations} citations</span>
-          <span class="relevance">🎯 ${(paper.relevance * 100).toFixed(0)}% relevant</span>
-          <span class="source">📚 ${paper.source}</span>
+          <span class="citations">${paper.citations} citations</span>
+          <span class="relevance">${(paper.relevance * 100).toFixed(0)}% relevant</span>
+          <span class="source">${paper.source}</span>
         </div>
         <div class="paper-abstract">
           ${paper.abstract.substring(0, 150)}...
         </div>
         <div class="paper-actions">
-          <button onclick="this.parentElement.parentElement.classList.toggle('saved')">💾 Save</button>
-          <button onclick="this.parentElement.parentElement.style.display='none'">❌ Hide</button>
-          <button onclick="window.open('${paper.url}', '_blank')" class="ai-action">🤖 Analyze</button>
+          <button onclick="this.parentElement.parentElement.classList.toggle('saved')">Save</button>
+          <button onclick="this.parentElement.parentElement.style.display='none'">Hide</button>
+          <button onclick="window.open('${paper.url}', '_blank')" class="ai-action">Analyze</button>
         </div>
       `;
       

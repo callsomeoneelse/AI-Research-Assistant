@@ -1,5 +1,4 @@
-// Background script for Research Assistant extension
-// SECURE: API key is only accessible in extension context, not web pages
+
 const OPENAI_API_KEY = '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';
 
 // Extension installation handler
