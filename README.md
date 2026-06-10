@@ -8,7 +8,7 @@ Finding relevant research papers is time-consuming, especially for niche topics.
 
 ## What it does
 
-The extension monitors what you're reading on academic websites and automatically suggests related papers in a floating sidebar, ranked by relevance. No manual searching required — it works in the background as you read.
+The extension monitors what you're reading on academic websites and automatically suggests related papers in a floating sidebar, ranked by relevance. No manual searching required, it works in the background as you read.
 
 - Detects research context from the current page
 - Fetches related papers via the arXiv API
