@@ -1,6 +1,6 @@
 # AI Research Assistant
 
-A Chrome extension that proactively surfaces relevant research papers while you browse academic websites — reducing manual literature discovery time by 60%.
+A Chrome extension that proactively surfaces relevant research papers while you browse academic websites, reducing the time spent on manual literature discovery.
 
 ## The problem
 
@@ -60,6 +60,4 @@ The extension uses a content script to read the current page and extract researc
 
 ## Built at
 
-This project was built as a functional prototype over 3 days, demonstrating proactive contextual paper suggestions with AI-powered relevance ranking.
-
-
+Built as a functional prototype over 3 days at a hackathon, demonstrating proactive contextual paper suggestions with AI-powered relevance ranking.
