@@ -4,7 +4,7 @@ A Chrome extension that proactively surfaces relevant research papers while you 
 
 ## The problem
 
-Finding relevant research papers is time-consuming, especially for niche topics. Researchers spend a significant portion of their time on discovery alone — searching, cross-referencing, and manually following citation trails — before they can do any actual research.
+Finding relevant research papers is time-consuming, especially for niche topics. Researchers spend a significant portion of their time on discovery alone; searching, cross-referencing, and manually following citation trails before they can do any actual research.
 
 ## What it does
 
